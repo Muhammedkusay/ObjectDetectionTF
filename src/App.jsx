@@ -17,6 +17,11 @@ function App() {
     setIsLoading(true)
 
     async function startWebcam() {
+      if (!videoRef.current) {
+        // Wait until the next frame if the ref isn't ready yet
+        requestAnimationFrame(startWebcam)
+        return
+      }
 
       if (videoRef.current.srcObject) {
         videoRef.current.srcObject.getTracks().forEach(track => track.stop());
@@ -31,10 +36,8 @@ function App() {
       }
 
       const stream = await navigator.mediaDevices.getUserMedia(constraints)
-      if(videoRef.current) {
-        videoRef.current.srcObject = stream
-        await videoRef.current.play()
-      }
+      videoRef.current.srcObject = stream
+      await videoRef.current.play()
     }
 
     async function loadModel() {
@@ -102,7 +105,7 @@ function App() {
         ? <p>Loading...</p> 
         : (
           <div className='inner-div'>
-            <video ref={videoRef} />
+            <video ref={videoRef} playsInline />
             <canvas ref={canvasRef} />
             <button onClick={handleCameraButton}>Flip The Camera</button>
           </div>
