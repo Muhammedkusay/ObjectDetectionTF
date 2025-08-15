@@ -17,31 +17,33 @@ function App() {
     setIsLoading(true)
 
     async function startWebcam() {
-      // stop previous stream if exists
+      if(!videoRef.current) return
+
       if (videoRef.current.srcObject) {
         videoRef.current.srcObject.getTracks().forEach(track => track.stop());
       }
-      
+
       const constraints = {
         video: { 
           width: window.innerWidth < 600 ? 360 : 800,
-          height: window.innerWidth < 600 ? 900 : 600,
+          height: 600,
           facingMode: camera
         }
       }
 
       const stream = await navigator.mediaDevices.getUserMedia(constraints)
-      
-      videoRef.current.srcObject = stream
-      await videoRef.current.play()
+      if(videoRef.current) {
+        videoRef.current.srcObject = stream
+        await videoRef.current.play()
+      }
     }
 
     async function loadModel() {
-      modelRef.current = await cocoSsd.load({
-        modelUrl: `${window.location.origin}/models/ssd_mobilenet_v2/model.json`
-      })
+      modelRef.current = await cocoSsd.load() // default CDN model
       console.log('model loaded')
       setIsLoading(false)
+      // start webcam
+      startWebcam()
       runDetection()
     }
 
@@ -49,15 +51,13 @@ function App() {
 
     async function runDetection() {
       if(!modelRef.current || !videoRef.current) return
-
       if(videoRef.current.readyState < 2) {
         requestAnimationFrame(runDetection)
         return
       }
 
       frameCount++
-      
-      if(frameCount % 4 == 0) {
+      if(frameCount % 4 === 0) {
         try {
           const predictions = await modelRef.current.detect(videoRef.current)
           drawPredictions(predictions)
@@ -87,10 +87,8 @@ function App() {
         ctx.font = "16px Arial"
         ctx.fillText(`${pred.class} ${(pred.score * 100).toFixed(1)}%`, x + 5, y + 20)
       })
-
     }
 
-    startWebcam()
     loadModel()
 
   }, [camera])
@@ -102,14 +100,14 @@ function App() {
   return (
     <div className='parent-div'>
       {isLoading 
-        ? 
-        <p>Loading...</p> 
-        :       
-        (<div className='inner-div'>
-          <video ref={videoRef} />
-          <canvas ref={canvasRef} />
-          <button onClick={handleCameraButton}>Flip The Camera</button>
-        </div>)}
+        ? <p>Loading...</p> 
+        : (
+          <div className='inner-div'>
+            <video ref={videoRef} />
+            <canvas ref={canvasRef} />
+            <button onClick={handleCameraButton}>Flip The Camera</button>
+          </div>
+        )}
     </div>
   )
 }
