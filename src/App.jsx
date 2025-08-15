@@ -25,7 +25,7 @@ function App() {
       const constraints = {
         video: { 
           width: window.innerWidth < 600 ? 360 : 800,
-          height: 600,
+          height: window.innerWidth < 600 ? 900 : 600,
           facingMode: camera
         }
       }
@@ -37,7 +37,9 @@ function App() {
     }
 
     async function loadModel() {
-      modelRef.current = await cocoSsd.load()
+      modelRef.current = await cocoSsd.load({
+        modelUrl: `${window.location.origin}/models/ssd_mobilenet_v2/model.json`
+      })
       console.log('model loaded')
       setIsLoading(false)
       runDetection()
