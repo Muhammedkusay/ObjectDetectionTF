@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from 'react'
 import './App.css'
 import * as cocoSsd from '@tensorflow-models/coco-ssd'
-import * as tf from '@tensorflow/tfjs'
+import '@tensorflow/tfjs'
 
 function App() {
 
@@ -59,15 +59,7 @@ function App() {
     }
 
     const loadModel = async () => {
-
-      // Initialize TensorFlow.js backend
-      await tf.setBackend('webgl');
-      if (!tf.getBackend()) {
-        console.warn('WebGL not available, falling back to CPU');
-        await tf.setBackend('cpu');
-      }
-      console.log('Using backend:', tf.getBackend());
-
+      
       try{
         modelRef.current = await cocoSsd.load()
         if (!isMounted.current) return
