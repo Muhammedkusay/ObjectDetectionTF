@@ -17,7 +17,6 @@ function App() {
     setIsLoading(true)
 
     async function startWebcam() {
-      if(!videoRef.current) return
 
       if (videoRef.current.srcObject) {
         videoRef.current.srcObject.getTracks().forEach(track => track.stop());
