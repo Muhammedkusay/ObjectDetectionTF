@@ -22,18 +22,15 @@ function App() {
         videoRef.current.srcObject.getTracks().forEach(track => track.stop());
       }
       
-      let stream
+      const constraints = {
+        video: { 
+          width: window.innerWidth < 600 ? 300 : 800,
+          facingMode: camera
+        }
+      }
 
-      if(window.innerWidth < 600) {
-        stream = await navigator.mediaDevices.getUserMedia({ 
-          video: { width: 300, facingMode: camera }  // use 'user' for front camera
-        })
-      }
-      else {
-        stream = await navigator.mediaDevices.getUserMedia({ 
-          video: { width: 800, facingMode: camera }  // use 'user' for front camera
-        })
-      }
+      const stream = await navigator.mediaDevices.getUserMedia(constraints)
+      
 
       videoRef.current.srcObject = stream
       await videoRef.current.play()
@@ -59,8 +56,12 @@ function App() {
       frameCount++
       
       if(frameCount % 4 == 0) {
-        const predictions = await modelRef.current.detect(videoRef.current)
-        drawPredictions(predictions)
+        try {
+          const predictions = await modelRef.current.detect(videoRef.current)
+          drawPredictions(predictions)
+        } catch (err) {
+          console.error("Detection error:", err)
+        }
       }
       requestAnimationFrame(runDetection)
     }
@@ -93,8 +94,7 @@ function App() {
   }, [camera])
 
   function handleCameraButton() {
-    if(camera === 'environment') setCamera('user')
-    else setCamera('environment')
+    setCamera(prev => prev === 'environment' ? 'user' : 'environment')
   }
 
   return (
@@ -103,11 +103,11 @@ function App() {
         ? 
         <p>Loading...</p> 
         :       
-        <div className='inner-div'>
+        (<div className='inner-div'>
           <video ref={videoRef} />
           <canvas ref={canvasRef} />
           <button onClick={handleCameraButton}>Flip The Camera</button>
-        </div>}
+        </div>)}
     </div>
   )
 }
