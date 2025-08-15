@@ -24,14 +24,14 @@ function App() {
       
       const constraints = {
         video: { 
-          width: window.innerWidth < 600 ? 300 : 800,
+          width: window.innerWidth < 600 ? 360 : 800,
+          height: 600,
           facingMode: camera
         }
       }
 
       const stream = await navigator.mediaDevices.getUserMedia(constraints)
       
-
       videoRef.current.srcObject = stream
       await videoRef.current.play()
     }
