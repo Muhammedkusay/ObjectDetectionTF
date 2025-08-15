@@ -1,3 +1,6 @@
+* {
+    font-family: Arial, Helvetica, sans-serif;
+}
 
 .parent-div {
     min-height: 90vh;
@@ -9,10 +12,6 @@
 .inner-div {
     width: 800px;
     position: relative;
-}
-
-video {
-    width: 100%;
 }
 
 canvas {
@@ -38,7 +37,12 @@ button:hover {
 
 @media(max-width: 600px) {
     .inner-div {
-        width: 100%;
-        overflow: hidden;
+        width: fit-content;
+        margin: 0 auto 0;
+    }
+    button {
+        display: block;
+        width: fit-content;
+        margin: 0 auto 0;
     }
 }
