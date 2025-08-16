@@ -8,22 +8,17 @@ function App() {
   const videoRef = useRef(null)
   const modelRef = useRef(null)
   const canvasRef = useRef(null)
-  const isMounted = useRef(true)
-  const animationFrameId = useRef(null)
 
   const [isLoading, setIsLoading] = useState(false)
   const [camera, setCamera] = useState('environment')
 
   useEffect(() => {
 
-    isMounted.current = true
-
     const startWebcam = async () => {
-      if (!isMounted.current || !videoRef.current) return
-
-      if (videoRef.current.srcObject) {
-        videoRef.current.srcObject.getTracks().forEach(track => track.stop());
-      }
+      
+      // if (videoRef.current.srcObject) {
+      //   videoRef.current.srcObject.getTracks().forEach(track => track.stop());
+      // }
 
       const constraints = {
         video: { 
@@ -35,17 +30,7 @@ function App() {
 
       try {
         const stream = await navigator.mediaDevices.getUserMedia(constraints)
-        if (!isMounted.current) {
-          stream.getTracks().forEach(track => track.stop())
-          return
-        }
-
         videoRef.current.srcObject = stream
-        videoRef.current.muted = true
-
-        await new Promise((resolve) => {
-          videoRef.current.onloadedmetadata = resolve
-        })
 
         await videoRef.current.play().catch(err => {
           console.warn("Video play error:", err)
@@ -53,47 +38,46 @@ function App() {
 
       } catch (err) {
         console.error("Camera error:", err);
-        if (isMounted.current) setIsLoading(false)
+        setIsLoading(false)
       }
 
     }
 
     const loadModel = async () => {
       
+      setIsLoading(true)
+
       try{
         modelRef.current = await cocoSsd.load()
-        if (!isMounted.current) return
-
         console.log('model loaded')
         setIsLoading(false)
         await startWebcam()
         runDetection()
       } catch (err) {
         console.error("Model loading error:", err)
-        if (isMounted.current) setIsLoading(false)
+        setIsLoading(false)
       }
     }
 
     let frameCount = 0
-    const runDetection = () => {
-      if (!isMounted.current || !modelRef.current || !videoRef.current) return
+    const runDetection = async() => {
+      if (!modelRef.current || !videoRef.current) return
       
       if (videoRef.current.readyState < 2) {
-        animationFrameId.current = requestAnimationFrame(runDetection)
+        requestAnimationFrame(runDetection)
         return
       }
 
       frameCount++
       if (frameCount % 4 === 0) {
-        modelRef.current.detect(videoRef.current)
-          .then(drawPredictions)
-          .catch(err => console.error("Detection error:", err))
+        await modelRef.current.detect(videoRef.current)
+              .then(predictions => drawPredictions(predictions))
       }
       
-      animationFrameId.current = requestAnimationFrame(runDetection)
+      requestAnimationFrame(runDetection)
     }
 
-     const drawPredictions = (predictions) => {
+     function drawPredictions(predictions) {
       if (!canvasRef.current || !videoRef.current) return
       
       const ctx = canvasRef.current.getContext("2d")
@@ -127,18 +111,8 @@ function App() {
         })
     }
 
-    setIsLoading(true)
     loadModel()
 
-    return () => {
-      isMounted.current = false
-      if (animationFrameId.current) {
-        cancelAnimationFrame(animationFrameId.current)
-      }
-      if (videoRef.current?.srcObject) {
-        videoRef.current.srcObject.getTracks().forEach(track => track.stop())
-      }
-    }
   }, [camera])
 
 
@@ -152,7 +126,7 @@ function App() {
         ? <p>Loading...</p> 
         : (
           <div className='inner-div'>
-            <video ref={videoRef} playsInline />
+            <video ref={videoRef} playsInline autoPlay muted/>
             <canvas ref={canvasRef} />
             <button onClick={handleCameraButton}>Flip The Camera</button>
           </div>
