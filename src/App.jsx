@@ -22,8 +22,8 @@ function App() {
 
       const constraints = {
         video: { 
-          width: window.innerWidth < 768 ? 360 : 800,
-          height: 600,
+          width: window.innerWidth < 768 ? {ideal: window.innerWidth} : 800,
+          height: window.innerWidth < 768 ? {ideal: window.innerHeight} : 600,
           facingMode: camera
         }
       }

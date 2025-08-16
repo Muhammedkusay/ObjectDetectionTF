@@ -10,7 +10,7 @@
 }
 
 .inner-div {
-    width: 800px;
+    width: fit-content;
     position: relative;
 }
 
@@ -21,7 +21,9 @@ canvas {
 }
 
 button {
-    width: 100%;
+    display: block;
+    width: fit-content;
+    margin: 0 auto 0;
     padding: 16px;
     background-color: rgb(0, 76, 199);
     outline: 0;
@@ -31,18 +33,11 @@ button {
     color: white;
 }
 
-button:hover {
-    background-color: rgb(7, 68, 165);
+video, canvas {
+    width: 100%;
+    height: auto;
 }
 
-@media(max-width: 600px) {
-    .inner-div {
-        width: fit-content;
-        margin: 0 auto 0;
-    }
-    button {
-        display: block;
-        width: fit-content;
-        margin: 0 auto 0;
-    }
+button:hover {
+    background-color: rgb(7, 68, 165);
 }
