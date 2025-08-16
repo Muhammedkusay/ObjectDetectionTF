@@ -4,7 +4,7 @@ A simple object detection web app that can detect some of objects which we see c
 for example it could be a person, cell phone, chair, cup, water bottle etc.
 
 You can try it now,
-<a href="https://objectdet.netlify.app">Click Here<a>
+<a href="https://objectdet.netlify.app" target="_blank">Click Here<a>
 For Demo
 <br>
 
