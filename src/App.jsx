@@ -22,8 +22,6 @@ function App() {
 
       const constraints = {
         video: { 
-          width: window.innerWidth < 768 ? {ideal: window.innerWidth} : 800,
-          height: window.innerWidth < 768 ? {ideal: window.innerHeight} : 600,
           facingMode: camera
         }
       }
@@ -131,7 +129,7 @@ function App() {
         : (
           <div className='w-fit relative'>
             <video ref={videoRef} playsInline autoPlay muted className='w-full'/>
-            <canvas ref={canvasRef} className='absolute left-0 top-0'/>
+            <canvas ref={canvasRef} className='w-full absolute left-0 top-0'/>
             <button onClick={handleCameraButton} className='block w-48 absolute md:relative bottom-4 md:bottom-0 left-1/2 md:left-0 md:translate-x-0 -translate-x-1/2 bg-blue-100 text-blue-700 py-4 px-6 hover:bg-blue-200 border border-gray-200 cursor-pointer rounded-xl mt-6 mx-auto shadow-sm'>
               Flip The Camera
             </button>
